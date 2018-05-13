@@ -1,3 +1,6 @@
+package com.scenescrape;
+
+import com.amazonaws.services.lambda.runtime.Context;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -5,20 +8,28 @@ import org.jsoup.nodes.Element;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Map;
 import java.util.Properties;
 
 public class Main {
 
-    private static final String URL = "xxxx";
-    private static final String HOST = "xxxx";
-    private static final String PORT = "xxxx";
-    private static final String USER = "xxxx";
-    private static final String PASSWORD = "xxxx";
-    private static final String RECIPIENT = "xxxx";
+    private static final String URL = System.getenv("URL");
+    private static final String HOST = System.getenv("HOST");
+    private static final String PORT = System.getenv("PORT");
+    private static final String USER = System.getenv("USER");
+    private static final String PASSWORD = System.getenv("PASSWORD");
+    private static final String RECIPIENT = System.getenv("RECIPIENT");
 
-    public static void main(String[] args) {
+    public String handleRequest(Map<String, Object> input, Context context) {
+        context.getLogger().log("Email sent successfully");
+        scrape();
+
+        return null;
+    }
+
+    private void scrape() {
         try {
-            Document doc = Jsoup.connect(URL).get();
+            Document doc = Jsoup.connect(URL).userAgent("Mozilla").get();
 
             StringBuilder builder = new StringBuilder();
             builder.append("Here are the latest releases: \n\n\n");
@@ -35,7 +46,7 @@ public class Main {
         }
     }
 
-    private static void sendEmail(final String messageText) {
+    private void sendEmail(final String messageText) {
         Properties properties = new Properties();
         properties.put("mail.smtp.starttls.enable", "true");
         properties.put("mail.smtp.ssl.trust", HOST);
@@ -58,9 +69,6 @@ public class Main {
             message.setText(messageText);
 
             Transport.send(message);
-
-            System.out.print("Message sent");
-
         } catch (MessagingException e) {
             e.printStackTrace();
         }
