@@ -38,7 +38,7 @@ public class MainHandler implements RequestHandler<MainHandler.Request, Void> {
             StringBuilder builder = new StringBuilder();
             builder.append("Here are the latest releases: \n\n\n");
 
-            for (Element el : doc.select("table td a")) {
+            for (Element el : doc.select("h5")) {
                 builder.append(el.text());
                 builder.append("\n");
             }
